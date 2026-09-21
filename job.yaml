@@ -1,0 +1,32 @@
+resources:
+  jobs:
+    CineData_Pipeline_Medalhao:
+      name: CineData_Pipeline_Medalhao
+      trigger:
+        pause_status: UNPAUSED
+        periodic:
+          interval: 1
+          unit: DAYS
+      tasks:
+        - task_key: to_Bronze
+          notebook_task:
+            notebook_path: /Workspace/Users/env@poli.br/Landing_to_Bronze
+            base_parameters:
+              catalogo: workspace
+              caminho_volume: /Volumes/workspace/landing/inputs
+            source: WORKSPACE
+        - task_key: to_Silver
+          depends_on:
+            - task_key: to_Bronze
+          notebook_task:
+            notebook_path: /Workspace/Users/env@poli.br/Bronze_to_Silver
+            source: WORKSPACE
+        - task_key: to_Gold
+          depends_on:
+            - task_key: to_Silver
+          notebook_task:
+            notebook_path: /Workspace/Users/env@poli.br/Silver_to_Gold
+            source: WORKSPACE
+      queue:
+        enabled: true
+      performance_target: PERFORMANCE_OPTIMIZED
